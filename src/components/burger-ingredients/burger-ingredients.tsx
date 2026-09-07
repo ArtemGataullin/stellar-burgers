@@ -9,7 +9,7 @@ import {
   selectIngredientsLoading,
   selectMains,
   selectSauces
-} from '..//../services/constructor-Slice';
+} from '../../services/ingredients-slice';
 import { Preloader } from '@ui';
 
 export const BurgerIngredients: FC = () => {

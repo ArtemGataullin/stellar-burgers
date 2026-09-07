@@ -17,12 +17,25 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { OrderModal } from '../order-modal/order-modal';
 import { IngredientDetailsModal } from '../ingredient-details-modal/ingredient-details';
 import { ProtectedRoute } from '..//..//services/ProtectedRoute';
+import { RootState, useDispatch, useSelector } from '..//../services/store';
+import {
+  getIngredients,
+  selectIngredientsLoading
+} from '..//../services/ingredients-slice';
+import { useEffect } from 'react';
 
 const App = () => {
+  const dispatch = useDispatch();
   /** TODO: взять переменные из стора */
-  const isIngredientsLoading = false;
-  const ingredients = [''];
-  const error = null;
+  const isIngredientsLoading = useSelector(selectIngredientsLoading);
+  const ingredients = useSelector(
+    (state: RootState) => state.ingredients.ingredients
+  );
+  const error = useSelector((state: RootState) => state.ingredients.error);
+
+  useEffect(() => {
+    dispatch(getIngredients());
+  }, [dispatch]);
 
   return (
     <BrowserRouter>
