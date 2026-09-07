@@ -22,6 +22,8 @@
 
 .link_active {
   color: var(--text-primary-color);
+  text-decoration: none;
+  display: flex;
 }
 
 .link_position_last {
