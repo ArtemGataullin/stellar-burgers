@@ -12,7 +12,7 @@ const initialState: TProfileOrdersState = {
   error: null
 };
 
-const fetchrofileOrders = createAsyncThunk<TOrder[]>(
+export const fetchProfileOrders = createAsyncThunk<TOrder[]>(
   'profileOrders/fetchAll',
   async () => {
     const data = await getOrdersApi();
@@ -31,15 +31,15 @@ export const profileOrdersSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchrofileOrders.pending, (state) => {
+      .addCase(fetchProfileOrders.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchrofileOrders.rejected, (state, action) => {
+      .addCase(fetchProfileOrders.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Ошибка загрузки заказа';
       })
-      .addCase(fetchrofileOrders.fulfilled, (state, action) => {
+      .addCase(fetchProfileOrders.fulfilled, (state, action) => {
         state.loading = false;
         state.orders = action.payload;
       });

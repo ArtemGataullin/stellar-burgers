@@ -12,15 +12,8 @@ import {
 import { AppHeader, IngredientDetails, Modal, OrderInfo } from '@components';
 import { ProtectedRoute } from '..//..//services/ProtectedRoute';
 import styles from './app.module.css';
-
 import { Preloader } from '@ui';
-import {
-  BrowserRouter,
-  Route,
-  Routes,
-  useLocation,
-  useNavigate
-} from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { OrderModal } from '../order-modal/order-modal';
 import { useDispatch, useSelector } from '..//../services/store';
 import {
