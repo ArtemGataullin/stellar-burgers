@@ -1,3 +1,4 @@
+import { Location } from 'react-router-dom';
 export type TIngredient = {
   _id: string;
   name: string;
@@ -38,3 +39,13 @@ export type TUser = {
 };
 
 export type TTabMode = 'bun' | 'sauce' | 'main';
+
+export type LocationState = {
+  background?: Location;
+  from?: { pathname: string };
+};
+
+export type TRequestState = {
+  loading: boolean;
+  error: string | null;
+};
