@@ -10,10 +10,8 @@ import {
   TRegisterData,
   TLoginData
 } from '@api';
-
 import { TUser } from '@utils-types';
-import { deleteCookie, setCookie } from '../../utils/cookie';
-import { ResetPassword } from '@pages';
+import { setCookie, deleteCookie } from '../../utils/cookie';
 
 type TUserState = {
   isAuthChecked: boolean;
@@ -73,7 +71,7 @@ export const getUser = createAsyncThunk('user/get', async () => {
 });
 
 export const updateUser = createAsyncThunk(
-  'user/',
+  'user/update',
   async (data: Partial<TRegisterData>) => {
     const res = await updateUserApi(data);
     return res.user;
@@ -92,6 +90,7 @@ export const forgotPassword = createAsyncThunk(
     await forgotPasswordApi(data);
   }
 );
+
 export const resetPassword = createAsyncThunk(
   'user/resetPassword',
   async (data: { password: string; token: string }) => {
@@ -103,12 +102,12 @@ export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setAuthChtked: (state, action: PayloadAction<boolean>) => {
+    setAuthChecked: (state, action: PayloadAction<boolean>) => {
       state.isAuthChecked = action.payload;
     },
     clearUser: (state) => {
       state.user = null;
-      state.isAuthChecked = false;
+      state.isAuthenticated = false;
     }
   },
   selectors: {
@@ -126,7 +125,7 @@ export const userSlice = createSlice({
     resetPasswordRequestSelector: (state) => state.resetPasswordRequest,
     resetPasswordErrorSelector: (state) => state.resetPasswordError
   },
-  extraReducers(builder) {
+  extraReducers: (builder) => {
     builder
       .addCase(registerUser.pending, (state) => {
         state.registerUserRequest = true;
@@ -159,13 +158,13 @@ export const userSlice = createSlice({
       })
       .addCase(getUser.pending, (state) => {})
       .addCase(getUser.rejected, (state) => {
-        state.isAuthenticated = true;
         state.isAuthChecked = true;
+        state.isAuthenticated = false;
         state.user = null;
       })
       .addCase(getUser.fulfilled, (state, action) => {
-        state.isAuthenticated = true;
         state.isAuthChecked = true;
+        state.isAuthenticated = true;
         state.user = action.payload;
       })
       .addCase(updateUser.pending, (state) => {
@@ -182,7 +181,7 @@ export const userSlice = createSlice({
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
-        state.isAuthenticated = true;
+        state.isAuthenticated = false;
         state.isAuthChecked = true;
       })
       .addCase(forgotPassword.pending, (state) => {
@@ -191,7 +190,8 @@ export const userSlice = createSlice({
       })
       .addCase(forgotPassword.rejected, (state, action) => {
         state.forgotPasswordRequest = false;
-        state.forgotPasswordError = action.error.message || 'Ошибка обновления';
+        state.forgotPasswordError =
+          action.error.message || 'Ошибка восстановления';
       })
       .addCase(forgotPassword.fulfilled, (state) => {
         state.forgotPasswordRequest = false;
@@ -202,7 +202,8 @@ export const userSlice = createSlice({
       })
       .addCase(resetPassword.rejected, (state, action) => {
         state.resetPasswordRequest = false;
-        state.resetPasswordError = action.error.message || 'Ошибка обновления';
+        state.resetPasswordError =
+          action.error.message || 'Ошибка сброса пароля';
       })
       .addCase(resetPassword.fulfilled, (state) => {
         state.resetPasswordRequest = false;
@@ -210,7 +211,7 @@ export const userSlice = createSlice({
   }
 });
 
-export const { setAuthChtked, clearUser } = userSlice.actions;
+export const { setAuthChecked, clearUser } = userSlice.actions;
 export const {
   userSelector,
   isAuthCheckedSelector,

@@ -24,6 +24,7 @@ import {
 } from '..//../services/slices/ingredients-slice';
 import { useEffect } from 'react';
 import { LocationState } from '@utils-types';
+import { getUser } from '../../services/slices/user-slice';
 
 const App = () => {
   const location = useLocation();
@@ -37,6 +38,7 @@ const App = () => {
 
   useEffect(() => {
     dispatch(fetchIngredients());
+    dispatch(getUser);
   }, [dispatch]);
 
   const handleModalClose = () => {

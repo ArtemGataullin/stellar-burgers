@@ -8,7 +8,7 @@ import { LocationState } from '@utils-types';
 
 type ProtectedRouteProps = {
   onlyUnAuth?: boolean;
-  children: React.ReactElement;
+  children: ReactNode;
 };
 
 export const ProtectedRoute: FC<ProtectedRouteProps> = ({

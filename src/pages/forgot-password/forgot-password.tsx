@@ -1,8 +1,7 @@
 import { FC, useState, SyntheticEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from '..//../services/store';
-import { forgotPasswordApi } from '@api';
 import { ForgotPasswordUI } from '@ui-pages';
+import { useDispatch, useSelector } from '..//../services/store';
 import {
   forgotPassword,
   forgotPasswordErrorSelector
