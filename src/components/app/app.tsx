@@ -21,7 +21,7 @@ import {
   fetchIngredients,
   ingredientsLoadingSelector,
   ingredientsSelector
-} from '..//../services/slices/ingredients-slice';
+} from '../../services/slices/ingredients-slice';
 import { useEffect } from 'react';
 import { LocationState } from '@utils-types';
 import { getUser } from '../../services/slices/user-slice';

@@ -15,7 +15,7 @@ const initialState: TConstructorState = {
   isLoading: false
 };
 
-const getIngredients = createAsyncThunk(
+export const getIngredients = createAsyncThunk(
   'burgerConstructor/getIngredients',
   async () => {
     const res = await getIngredientsApi();
