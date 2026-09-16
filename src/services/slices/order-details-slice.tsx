@@ -23,8 +23,6 @@ export const fetchOrderByNumber = createAsyncThunk<TOrder, number>(
   }
 );
 
-
-
 export const orderDetailsSlice = createSlice({
   name: 'orderDetails',
   initialState,
