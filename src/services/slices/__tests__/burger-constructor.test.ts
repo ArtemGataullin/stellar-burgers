@@ -7,10 +7,15 @@ import {
   constructorItemsSelector,
   bunSelector,
   ingredientsSelector,
-  areIngredientsLoading
+  areIngredientsLoading,
+  getIngredients
 } from '../burger-constructor-slice';
 import { burgerConstructorSlice } from '../burger-constructor-slice';
-import { TConstructorIngredient } from '@utils-types';
+import { TConstructorIngredient, TIngredient } from '@utils-types';
+import { generateId } from '../../../utils/generate-id';
+
+jest.mock('../../../utils/generate-id');
+const mockedGenerateId = generateId as jest.MockedFunction<typeof generateId>;
 
 const reducer = burgerConstructorSlice.reducer;
 
@@ -65,6 +70,35 @@ describe('тесты редьюсеров слайса burger-сonstructor-slice
     image_mobile: 'https://code.s3.yandex.net/react/code/meat-02-mobile.png',
     id: 'ing-2'
   };
+
+  const mockIngridients: TIngredient[] = [
+    {
+      _id: '643d69a5c3f7b9001cfa0941',
+      name: 'Биокотлета из марсианской Магнолии',
+      type: 'main',
+      proteins: 420,
+      fat: 142,
+      carbohydrates: 242,
+      calories: 4242,
+      price: 424,
+      image: 'https://code.s3.yandex.net/react/code/meat-01.png',
+      image_large: 'https://code.s3.yandex.net/react/code/meat-01-large.png',
+      image_mobile: 'https://code.s3.yandex.net/react/code/meat-01-mobile.png'
+    },
+    {
+      _id: '643d69a5c3f7b9001cfa093f',
+      name: 'Мясо бессмертных моллюсков Protostomia',
+      type: 'main',
+      proteins: 433,
+      fat: 244,
+      carbohydrates: 33,
+      calories: 420,
+      price: 1337,
+      image: 'https://code.s3.yandex.net/react/code/meat-02.png',
+      image_large: 'https://code.s3.yandex.net/react/code/meat-02-large.png',
+      image_mobile: 'https://code.s3.yandex.net/react/code/meat-02-mobile.png'
+    }
+  ];
 
   const mockSauc: TConstructorIngredient = {
     _id: '643d69a5c3f7b9001cfa0944',
@@ -248,6 +282,48 @@ describe('тесты редьюсеров слайса burger-сonstructor-slice
           burgerConstructor: { ...filledState, isLoading: true }
         })
       ).toBe(true);
+    });
+  });
+
+  describe('getIngredients', () => {
+    afterEach(() => {
+      mockedGenerateId.mockReset();
+    });
+
+    test('pending: включает loading и не затирает уже имеющиеся ingredients', () => {
+      const state = reducer(
+        { ...initialState, ingredients: [mockIngridient1] },
+        getIngredients.pending('')
+      );
+
+      expect(state.isLoading).toBe(true);
+      expect(state.ingredients).toEqual([mockIngridient1]);
+    });
+
+    test('fulfilled: сохраняет ингредиенты с id и выключает loading', () => {
+      mockedGenerateId.mockReturnValueOnce('id-1').mockReturnValueOnce('id-2');
+
+      const state = reducer(
+        { ...initialState, isLoading: false },
+        getIngredients.fulfilled(mockIngridients, '')
+      );
+
+      expect(state.isLoading).toBe(false);
+      expect(state.ingredients).toEqual([
+        { ...mockIngridients[0], id: 'id-1' },
+        { ...mockIngridients[1], id: 'id-2' }
+      ]);
+    });
+
+    test('rejected: выключает loading и не трогает ingredients', () => {
+      const errorMessage = 'Ошибка загрузки ингредиентов';
+      const state = reducer(
+        { ...initialState, isLoading: true },
+        getIngredients.rejected(new Error(errorMessage), '')
+      );
+
+      expect(state.isLoading).toBe(false);
+      expect(state.ingredients).toEqual([]);
     });
   });
 });

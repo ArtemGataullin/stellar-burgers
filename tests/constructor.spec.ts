@@ -47,20 +47,15 @@ test.describe('Страница конструктора бургера', () => 
     // --- Проверки в конструкторе ---
     const constructor = page.locator('[data-testid="burger-constructor"]');
 
-    if (bunName) {
-      await expect(constructor.locator(`text=${bunName} (верх)`)).toBeVisible({
-        timeout: 10000
-      });
-      await expect(constructor.locator(`text=${bunName} (низ)`)).toBeVisible({
-        timeout: 10000
-      });
-    }
-
-    if (fillingName) {
-      await expect(constructor.locator(`text=${fillingName}`)).toBeVisible({
-        timeout: 10000
-      });
-    }
+    await expect(constructor.locator(`text=${bunName} (верх)`)).toBeVisible({
+      timeout: 10000
+    });
+    await expect(constructor.locator(`text=${bunName} (низ)`)).toBeVisible({
+      timeout: 10000
+    });
+    await expect(constructor.locator(`text=${fillingName}`)).toBeVisible({
+      timeout: 10000
+    });
   });
   // Протестирована работа модальных окон:
   test('должен открывать модальное окно ингредиента по клику', async ({
@@ -90,15 +85,46 @@ test.describe('Страница конструктора бургера', () => 
     const ingredientName = await ingredientCard
       .locator('.text_type_main-default')
       .textContent();
+    expect(ingredientName).toBeTruthy();
+
+    const calories = await ingredientCard
+      .locator('[data-testid="ingredient-calories"]')
+      .textContent();
+    const proteins = await ingredientCard
+      .locator('[data-testid="ingredient-proteins"]')
+      .textContent();
+    const fat = await ingredientCard
+      .locator('[data-testid="ingredient-fat"]')
+      .textContent();
+    const carbohydrates = await ingredientCard
+      .locator('[data-testid="ingredient-carbohydrates"]')
+      .textContent();
+
+    expect(calories).toBeTruthy();
+    expect(proteins).toBeTruthy();
+    expect(fat).toBeTruthy();
+    expect(carbohydrates).toBeTruthy();
 
     await ingredientCard.click();
 
     const modal = page.locator('[data-testid="modal"]');
     await expect(modal).toBeVisible();
 
-    // Проверяем, что в модалке отображается название именно кликнутого ингредиента
-    const modalTitle = modal.locator('h3.text_type_main-medium');
-    await expect(modalTitle).toHaveText(ingredientName || '');
+    await expect(modal.locator('[data-testid="ingredient-name"]')).toHaveText(
+      ingredientName as string
+    );
+    await expect(
+      modal.locator('[data-testid="ingredient-calories"]')
+    ).toHaveText(calories as string);
+    await expect(
+      modal.locator('[data-testid="ingredient-proteins"]')
+    ).toHaveText(proteins as string);
+    await expect(modal.locator('[data-testid="ingredient-fat"]')).toHaveText(
+      fat as string
+    );
+    await expect(
+      modal.locator('[data-testid="ingredient-carbohydrates"]')
+    ).toHaveText(carbohydrates as string);
   });
 
   test('должен закрывать модальное окно ингредиента по клику на крестик', async ({
@@ -174,14 +200,6 @@ test.describe('Тeстирование создания заказа', () => {
     await page.waitForTimeout(1000);
   });
 
-  test.afterEach('Очищаем токены после каждого теста', async ({ page }) => {
-    await page.addInitScript(() => {
-      document.cookie =
-        'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      localStorage.removeItem('refreshToken');
-    });
-  });
-
   test('должен создать заказ и очистить конструктор', async ({ page }) => {
     // Добавление булки в конструктор
     const bunCard = page
@@ -194,6 +212,8 @@ test.describe('Тeстирование создания заказа', () => {
     const bunName = await bunCard
       .locator('.text_type_main-default')
       .textContent();
+
+    expect(bunName).toBeTruthy();
 
     const bunAddButton = bunCard.getByRole('button', { name: 'Добавить' });
     await bunAddButton.click();
@@ -218,20 +238,15 @@ test.describe('Тeстирование создания заказа', () => {
     const constructor = page.locator('[data-testid="burger-constructor"]');
 
     // Проверка наличия ингредиентов в конструкторе
-    if (bunName) {
-      await expect(constructor.locator(`text=${bunName} (верх)`)).toBeVisible({
-        timeout: 10000
-      });
-      await expect(constructor.locator(`text=${bunName} (низ)`)).toBeVisible({
-        timeout: 10000
-      });
-    }
-
-    if (mainName) {
-      await expect(constructor.locator(`text=${mainName}`)).toBeVisible({
-        timeout: 10000
-      });
-    }
+    await expect(constructor.locator(`text=${bunName} (верх)`)).toBeVisible({
+      timeout: 10000
+    });
+    await expect(constructor.locator(`text=${bunName} (низ)`)).toBeVisible({
+      timeout: 10000
+    });
+    await expect(constructor.locator(`text=${mainName}`)).toBeVisible({
+      timeout: 10000
+    });
 
     // Проверка нажатия кнопки ОФормить заказ
     const orderButton = page.locator('[data-testid="order-button"]');
@@ -257,17 +272,12 @@ test.describe('Тeстирование создания заказа', () => {
     await expect(constructor.locator('text=Выберите начинку')).toBeVisible();
 
     // Проверка что добавленные ингридиенты исчезли
-    if (bunName) {
-      await expect(
-        constructor.locator(`text=${bunName} (верх)`)
-      ).not.toBeVisible();
-      await expect(
-        constructor.locator(`text=${bunName} (низ)`)
-      ).not.toBeVisible();
-    }
-
-    if (mainName) {
-      await expect(constructor.locator(`text=${mainName}`)).not.toBeVisible();
-    }
+    await expect(
+      constructor.locator(`text=${bunName} (верх)`)
+    ).not.toBeVisible();
+    await expect(
+      constructor.locator(`text=${bunName} (низ)`)
+    ).not.toBeVisible();
+    await expect(constructor.locator(`text=${mainName}`)).not.toBeVisible();
   });
 });
