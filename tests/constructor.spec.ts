@@ -1,4 +1,6 @@
 import { expect, test } from '@playwright/test';
+import { readOrderNumberFromHar } from './helpers/read-order-number';
+import { readIngredientFromHar } from './helpers/read-ingredient-from-har';
 
 test.describe('Страница конструктора бургера', () => {
   test.beforeEach(
@@ -13,7 +15,6 @@ test.describe('Страница конструктора бургера', () => 
       await page.waitForSelector('[data-testid="ingredient-card"]', {
         timeout: 15000
       });
-      await page.waitForTimeout(1000);
     }
   );
 
@@ -76,34 +77,15 @@ test.describe('Страница конструктора бургера', () => 
   test('должен отоброжать корректные данные в модальном окне', async ({
     page
   }) => {
+    const expected = readIngredientFromHar(
+      './tests/hars/ingredients.har',
+      'Краторная булка N-200i'
+    );
+
     const ingredientCard = page
       .locator('[data-testid="ingredient-card"]')
-      .filter({
-        hasText: 'Краторная булка N-200i'
-      })
+      .filter({ hasText: expected.name })
       .first();
-    const ingredientName = await ingredientCard
-      .locator('.text_type_main-default')
-      .textContent();
-    expect(ingredientName).toBeTruthy();
-
-    const calories = await ingredientCard
-      .locator('[data-testid="ingredient-calories"]')
-      .textContent();
-    const proteins = await ingredientCard
-      .locator('[data-testid="ingredient-proteins"]')
-      .textContent();
-    const fat = await ingredientCard
-      .locator('[data-testid="ingredient-fat"]')
-      .textContent();
-    const carbohydrates = await ingredientCard
-      .locator('[data-testid="ingredient-carbohydrates"]')
-      .textContent();
-
-    expect(calories).toBeTruthy();
-    expect(proteins).toBeTruthy();
-    expect(fat).toBeTruthy();
-    expect(carbohydrates).toBeTruthy();
 
     await ingredientCard.click();
 
@@ -111,20 +93,20 @@ test.describe('Страница конструктора бургера', () => 
     await expect(modal).toBeVisible();
 
     await expect(modal.locator('[data-testid="ingredient-name"]')).toHaveText(
-      ingredientName as string
+      expected.name
     );
-    await expect(
-      modal.locator('[data-testid="ingredient-calories"]')
-    ).toHaveText(calories as string);
-    await expect(
-      modal.locator('[data-testid="ingredient-proteins"]')
-    ).toHaveText(proteins as string);
-    await expect(modal.locator('[data-testid="ingredient-fat"]')).toHaveText(
-      fat as string
+    await expect(modal.locator('[data-testid="calories"]')).toHaveText(
+      String(expected.calories)
     );
-    await expect(
-      modal.locator('[data-testid="ingredient-carbohydrates"]')
-    ).toHaveText(carbohydrates as string);
+    await expect(modal.locator('[data-testid="proteins"]')).toHaveText(
+      String(expected.proteins)
+    );
+    await expect(modal.locator('[data-testid="fat"]')).toHaveText(
+      String(expected.fat)
+    );
+    await expect(modal.locator('[data-testid="carbohydrates"]')).toHaveText(
+      String(expected.carbohydrates)
+    );
   });
 
   test('должен закрывать модальное окно ингредиента по клику на крестик', async ({
@@ -170,7 +152,10 @@ test.describe('Страница конструктора бургера', () => 
   });
 });
 
+const ORDER_HAR = './tests/hars/order.har';
+
 test.describe('Тeстирование создания заказа', () => {
+  const expectedOrderNumber = readOrderNumberFromHar(ORDER_HAR);
   // Создание заказа:
   test.beforeEach(async ({ page }) => {
     // Используем HAR-файлы для моков (не inline-моки)
@@ -197,7 +182,6 @@ test.describe('Тeстирование создания заказа', () => {
     await page.waitForSelector('[data-testid="ingredient-card"]', {
       timeout: 15000
     });
-    await page.waitForTimeout(1000);
   });
 
   test('должен создать заказ и очистить конструктор', async ({ page }) => {
@@ -217,7 +201,6 @@ test.describe('Тeстирование создания заказа', () => {
 
     const bunAddButton = bunCard.getByRole('button', { name: 'Добавить' });
     await bunAddButton.click();
-    await page.waitForTimeout(1000);
 
     // Добавление начинку в конструктор
     const mainCard = page
@@ -257,7 +240,7 @@ test.describe('Тeстирование создания заказа', () => {
     await expect(modal).toBeVisible({ timeout: 10000 });
 
     const orderNumber = modal.locator('[data-testid="order-number"]');
-    await expect(orderNumber).toHaveText('12345');
+    await expect(orderNumber).toHaveText(String(expectedOrderNumber));
 
     // Проверка, закртытия модального окна
     const closeButton = page.locator('[data-testid="modal-close"]');

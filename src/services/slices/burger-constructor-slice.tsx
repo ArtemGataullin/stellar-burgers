@@ -9,7 +9,7 @@ type TConstructorState = {
   isLoading: boolean;
 };
 
-const initialState: TConstructorState = {
+export const initialState: TConstructorState = {
   bun: null,
   ingredients: [],
   isLoading: false

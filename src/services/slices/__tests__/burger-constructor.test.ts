@@ -8,7 +8,8 @@ import {
   bunSelector,
   ingredientsSelector,
   areIngredientsLoading,
-  getIngredients
+  getIngredients,
+  initialState
 } from '../burger-constructor-slice';
 import { burgerConstructorSlice } from '../burger-constructor-slice';
 import { TConstructorIngredient, TIngredient } from '@utils-types';
@@ -20,12 +21,6 @@ const mockedGenerateId = generateId as jest.MockedFunction<typeof generateId>;
 const reducer = burgerConstructorSlice.reducer;
 
 describe('тесты редьюсеров слайса burger-сonstructor-slice', () => {
-  const initialState = {
-    bun: null,
-    ingredients: [],
-    isLoading: false
-  };
-
   const mockBun: TConstructorIngredient = {
     _id: '643d69a5c3f7b9001cfa093c',
     name: 'Краторная булка N-200i',
