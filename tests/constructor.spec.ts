@@ -6,7 +6,7 @@ test.describe('Страница конструктора бургера', () => 
     async ({ page }) => {
       await page.routeFromHAR('./tests/hars/ingredients.har', {
         url: '**/api/ingredients',
-        update: true
+        update: false
       });
 
       await page.goto('/');
@@ -146,35 +146,33 @@ test.describe('Страница конструктора бургера', () => 
 
 test.describe('Тeстирование создания заказа', () => {
   // Создание заказа:
-  test.beforeEach(
-    'Созданы моковые данные для ингредиентов (в HAR-файле)',
-    async ({ page }) => {
-      await page.routeFromHAR('./tests/hars/ingredients.har', {
-        url: '**/api/ingredients',
-        update: true
-      });
-      await page.routeFromHAR('./tests/hars/user.har', {
-        url: '**/api/auth/user',
-        update: true
-      });
-      await page.routeFromHAR('./tests/hars/order.har', {
-        url: '**/api/orders',
-        update: true
-      });
-      //Подставляются моковые токены авторизации
+  test.beforeEach(async ({ page }) => {
+    // Используем HAR-файлы для моков (не inline-моки)
+    await page.routeFromHAR('./tests/hars/ingredients.har', {
+      url: '**/api/ingredients',
+      update: false
+    });
+    await page.routeFromHAR('./tests/hars/user.har', {
+      url: '**/api/auth/user',
+      update: false
+    });
+    await page.routeFromHAR('./tests/hars/order.har', {
+      url: '**/api/orders',
+      update: false
+    });
 
-      await page.addInitScript(() => {
-        document.cookie = 'accessToken=fake-access-token';
-        localStorage.setItem('refreshToken', 'fake-refresh-token');
-      });
+    // Подставляем фейковые токены авторизации
+    await page.addInitScript(() => {
+      document.cookie = 'accessToken=fake-access-token';
+      localStorage.setItem('refreshToken', 'fake-refresh-token');
+    });
 
-      await page.goto('/');
-      await page.waitForSelector('[data-testid="ingredient-card"]', {
-        timeout: 15000
-      });
-      await page.waitForTimeout(1000);
-    }
-  );
+    await page.goto('/');
+    await page.waitForSelector('[data-testid="ingredient-card"]', {
+      timeout: 15000
+    });
+    await page.waitForTimeout(1000);
+  });
 
   test.afterEach('Очищаем токены после каждого теста', async ({ page }) => {
     await page.addInitScript(() => {
