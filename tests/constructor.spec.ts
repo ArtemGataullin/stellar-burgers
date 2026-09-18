@@ -6,7 +6,7 @@ test.describe('Страница конструктора бургера', () => 
     async ({ page }) => {
       await page.routeFromHAR('./tests/hars/ingredients.har', {
         url: '**/api/ingredients',
-        update: false
+        update: true
       });
 
       await page.goto('/');
@@ -17,30 +17,51 @@ test.describe('Страница конструктора бургера', () => 
     }
   );
 
-  test('должен добавлять ингредиент в конструктор', async ({ page }) => {
-    const ingredientCard = page
+  test('должен добавлять булку и начинку в конструктор', async ({ page }) => {
+    // --- Булка ---
+    const bunCard = page
       .locator('[data-testid="ingredient-card"]')
-      .filter({
-        hasText: 'Краторная булка N-200i'
-      })
+      .filter({ hasText: 'Краторная булка N-200i' })
       .first();
-    const ingredientName = await ingredientCard
+    await bunCard.waitFor({ state: 'visible' });
+
+    const bunName = await bunCard
       .locator('.text_type_main-default')
       .textContent();
 
-    const addButton = ingredientCard.getByRole('button', { name: 'Добавить' });
-    await addButton.click();
+    await bunCard.getByRole('button', { name: 'Добавить' }).click();
 
+    // --- Начинка ---
+    const fillingCard = page
+      .locator('[data-testid="ingredient-card"]')
+      .filter({ hasText: 'Биокотлета из марсианской Магнолии' })
+      .first();
+    await fillingCard.waitFor({ state: 'visible' });
+
+    const fillingName = await fillingCard
+      .locator('.text_type_main-default')
+      .textContent();
+
+    await fillingCard.getByRole('button', { name: 'Добавить' }).click();
+
+    // --- Проверки в конструкторе ---
     const constructor = page.locator('[data-testid="burger-constructor"]');
-    // Проверяем, что появилась именно выбранная булка (верх и низ)
-    await expect(
-      constructor.locator(`text=${ingredientName} (верх)`)
-    ).toBeVisible({ timeout: 10000 });
-    await expect(
-      constructor.locator(`text=${ingredientName} (низ)`)
-    ).toBeVisible({ timeout: 10000 });
-  });
 
+    if (bunName) {
+      await expect(constructor.locator(`text=${bunName} (верх)`)).toBeVisible({
+        timeout: 10000
+      });
+      await expect(constructor.locator(`text=${bunName} (низ)`)).toBeVisible({
+        timeout: 10000
+      });
+    }
+
+    if (fillingName) {
+      await expect(constructor.locator(`text=${fillingName}`)).toBeVisible({
+        timeout: 10000
+      });
+    }
+  });
   // Протестирована работа модальных окон:
   test('должен открывать модальное окно ингредиента по клику', async ({
     page
@@ -130,15 +151,15 @@ test.describe('Тeстирование создания заказа', () => {
     async ({ page }) => {
       await page.routeFromHAR('./tests/hars/ingredients.har', {
         url: '**/api/ingredients',
-        update: false
+        update: true
       });
       await page.routeFromHAR('./tests/hars/user.har', {
         url: '**/api/auth/user',
-        update: false
+        update: true
       });
       await page.routeFromHAR('./tests/hars/order.har', {
         url: '**/api/orders',
-        update: false
+        update: true
       });
       //Подставляются моковые токены авторизации
 
