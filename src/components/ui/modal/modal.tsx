@@ -18,8 +18,9 @@ export const ModalUI: FC<TModalUIProps> = memo(
             className={styles.button}
             type='button'
             data-testid='modal-close'
+            onClick={onClose}
           >
-            <CloseIcon type='primary' onClick={onClose} />
+            <CloseIcon type='primary' />
           </button>
         </div>
         <div className={styles.content}>{children}</div>
