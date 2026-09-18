@@ -28,5 +28,6 @@
       "@selectors": ["src/services/selectors"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "tests"],
+  "ignoreDeprecations": "6.0"
 }
