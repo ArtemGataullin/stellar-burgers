@@ -9,13 +9,13 @@ type TConstructorState = {
   isLoading: boolean;
 };
 
-const initialState: TConstructorState = {
+export const initialState: TConstructorState = {
   bun: null,
   ingredients: [],
   isLoading: false
 };
 
-const getIngredients = createAsyncThunk(
+export const getIngredients = createAsyncThunk(
   'burgerConstructor/getIngredients',
   async () => {
     const res = await getIngredientsApi();
